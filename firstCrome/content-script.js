@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(function(msg) {
     concentrated = msg.concent_str;
     console.log(saji + ", " + concentrated);
     var value = $(this).html();
-    // console.log(value)
+    console.log(value)
     if(!value) {
         return true;
     }
@@ -24,6 +24,25 @@ chrome.runtime.onMessage.addListener(function(msg) {
     
 });
 });
+
+$(document).ready(function(){
+    getIngredients();
+});
+
+
+function getIngredients(){
+  $(".ingredient_row").each(function(index, element) {
+    var child = $(element).children();
+    console.log($(child).has(".name").text());
+    console.log($(child).has(".name").text().indexOf("ツナ")!=-1);
+    if($(child).has(".name").text().indexOf("ツナ")!=-1){
+      console.log($(element).find(".ingredient_quantity.amount"));
+      $(element).find(".ingredient_quantity.amount").html("ツナ");
+    }
+  })
+  
+}
+
 
 function sajiChanger(value) {
   if (value.indexOf('小さじ')!=-1 && saji=="b") {
