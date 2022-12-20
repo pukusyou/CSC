@@ -5,11 +5,9 @@ $(document).ready(function(){
 
 $("#button1").on("click", () => {
     const saji = $('input[name="saji"]:checked').val();
-    const concentrated = $('input[name="concentrated"]:checked').val();
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {
-        saji_str: saji,
-        concent_str: concentrated
+        saji_str: saji 
       });
     });
   });

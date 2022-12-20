@@ -1,36 +1,37 @@
-var saji;
-var concentrated;
+var concentrated, glams, saji;
 
-var seasoning ={"水": 5, "酒": 5, "酢":5,"醤油":6,"みりん":6,"みそ":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜":7,
-"メープルシロップ":7,"マーマレード":7,"油":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉":3,
+var seasoning ={"水": 5, "酒": 5, "酢":5,"醤油,しょうゆ":6,"みりん":6,"みそ":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜":7,
+"メープルシロップ":7,"マーマレード":7,"油,オリーブオイル":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉":3,
 "ベーキングパウダー":4,"重曹":4,"パン粉":1,"オートミール":2,"粉チーズ":2,"ごま":3,"ねりごま":6,"マヨネーズ":4,"牛乳":5,
 "ヨーグルト":5,"生クリーム":5,"トマトピューレ":6,"トマトケチャップ":6,"ウスターソース":6,"中濃ソース":7, "ドレッシング":5,
 "わさび粉":2,"わさび":5,"カレー粉":2,"からし粉":2,"からし":5,"マスタード":5,"胡椒":2,"豆板醤":7,"甜麺醤":7,"コチュジャン":7,
 "オイスターソース":6,"ナンプラー":6,"脱脂粉乳":2,"粉ゼラチン":3,"粉寒天":1,"めんつゆ":6,"ポン酢":6,"焼肉のたれ":6,"味の素":4,
-"顆粒だしの素":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2};
+"顆粒だし,顆粒和風だし":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2};
 
 
 chrome.runtime.onMessage.addListener(function(msg) {
+  var saji = msg.saji_str;
   if (msg.reload) {
     location.reload();
     return;
+  }else{
+    if(saji=="g"){
+      changeIngredients();
+    }else{
+      $(".ingredient_quantity.amount").each(function(index,element){
+        var value = $(element).html();
+        if(!value) {
+            return;
+        }
+        if (saji=="b") {
+          table_changer(element);
+        }else if (saji=="s") {
+          tea_changer(element);
+        }
+      });
+    } 
   }
-  $(".ingredient_quantity.amount").each(function(){
-    saji = msg.saji_str;
-    concentrated = msg.concent_str;
-    var value = $(this).html();
-    if(!value) {
-        return true;
-    }
-    changeIngredients();
-    
-    if(value.indexOf('大さじ') != -1 || value.indexOf('小さじ') != -1) {
-      console.log(value);
-      // $(this).html(sajiChanger(value));
-    }
-    
-    
-});
+
 });
 
 $(document).ready(function(){
@@ -42,18 +43,20 @@ function changeIngredients(){
   $(".ingredient_row").each(function(index, element) {
     var child = $(element).children();
     for (let key in seasoning){
-      if($(child).has(".name").text().indexOf(key)!=-1){
-        if ($(element).find(".ingredient_quantity.amount").text().indexOf("大さじ")!=-1) {
-          var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(".ingredient_quantity.amount").text()));
-          var glams = tablespoon_num * 3.0 * seasoning[key];
-          $(element).find(".ingredient_quantity.amount").html(glams + "グラム");
-        }else if ($(element).find(".ingredient_quantity.amount").text().indexOf("小さじ")!=-1) {
-          var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(".ingredient_quantity.amount").text()));
-          var glams = teaspoon_num * seasoning[key];
-          $(element).find(".ingredient_quantity.amount").html(glams + "グラム");
+      key.split(",").forEach(sina => {
+        if($(child).has(".name").text().indexOf(sina)!=-1){
+          if ($(element).find(".ingredient_quantity.amount").text().indexOf("大さじ")!=-1) {
+            var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(".ingredient_quantity.amount").text()));
+
+            var glams = tablespoon_num * 3.0 * seasoning[key];
+            $(element).find(".ingredient_quantity.amount").html(glams + "g");
+          }else if ($(element).find(".ingredient_quantity.amount").text().indexOf("小さじ")!=-1) {
+            var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(".ingredient_quantity.amount").text()));
+            var glams = teaspoon_num * seasoning[key];
+            $(element).find(".ingredient_quantity.amount").html(glams + "g");
+          }
         }
-        
-      }
+      });
     }  
   })
   
@@ -65,6 +68,7 @@ function changeIngredients(){
  * @returns 値(文字列)
  */
 function getTeaspoon_value(value) {
+  value = hankaku2Zenkaku(value);
   var pattern = /小さじ(.*)/u;
   return value.match(pattern)[1];
 }
@@ -75,13 +79,16 @@ function getTeaspoon_value(value) {
  * @returns 値(文字列)
  */
 function getTablespoon_value(value) {
-  var pattern = /大さじ(.*)/u
+  value = hankaku2Zenkaku(value);
+  var pattern = /大さじ(.*)/u;
   return value.match(pattern)[1];
 }
 
 
-function sajiChanger(value) {
-  if (value.indexOf('小さじ')!=-1 && saji=="b") {
+function tea_changer(element) {
+  var value = $(element).html();
+  value = hankaku2Zenkaku(value);
+  if (value.indexOf('小さじ')!=-1) {
     var pattern = /小さじ(.*)/u;
     var teaspoon = value.match(pattern);
     if (teaspoon[1].indexOf('〜')!=-1) {
@@ -90,14 +97,19 @@ function sajiChanger(value) {
       tilde_teaspoon.forEach(element => {
         result.push(round(value_generalizate(element) / 3));
       });
-      return "大さじ" + result[0] + "〜" + result[1];
+      return $(element).html("大さじ" + result[0] + "〜" + result[1]);
     }else{
       var teaspoon_num = value_generalizate(teaspoon[1]);
       var result = teaspoon_num / 3;
       result = round(result);
-      return "大さじ" + result;
+      return $(element).html("大さじ" + result);
     }
-  }else if (value.indexOf('大さじ')!=-1 && saji=="s") {
+  }
+}
+function table_changer(element) {
+  var value = $(element).html();
+  value = hankaku2Zenkaku(value);
+  if (value.indexOf('大さじ')!=-1) {
     var pattern = /大さじ(.*)/u
     var tablespoon = value.match(pattern);
     if (tablespoon[1].indexOf('〜')!=-1) {
@@ -106,12 +118,12 @@ function sajiChanger(value) {
       tilde_tablespoon.forEach(element => {
         result.push(round(value_generalizate(element) * 3));
       });
-      return "大さじ" + result[0] + "〜" + result[1];
+      return $(element).html("大さじ" + result[0] + "〜" + result[1]);
       }else{
         var tablespoon_num = value_generalizate(tablespoon[1]);
         var result = tablespoon_num * 3;
         result = round(result);
-        return "小さじ" + result;
+        return $(element).html("小さじ" + result);
       }
   }
 }
@@ -149,4 +161,10 @@ function value_generalizate(param) {
     result = parseFloat(param);
   }
   return result;
+}
+
+function hankaku2Zenkaku(str) {
+  return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+  });
 }
