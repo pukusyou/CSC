@@ -1,6 +1,15 @@
 var saji;
 var concentrated;
 
+var seasoning ={"水": 5, "酒": 5, "酢":5,"醤油":6,"みりん":6,"みそ":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜":7,
+"メープルシロップ":7,"マーマレード":7,"油":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉":3,
+"ベーキングパウダー":4,"重曹":4,"パン粉":1,"オートミール":2,"粉チーズ":2,"ごま":3,"ねりごま":6,"マヨネーズ":4,"牛乳":5,
+"ヨーグルト":5,"生クリーム":5,"トマトピューレ":6,"トマトケチャップ":6,"ウスターソース":6,"中濃ソース":7, "ドレッシング":5,
+"わさび粉":2,"わさび":5,"カレー粉":2,"からし粉":2,"からし":5,"マスタード":5,"胡椒":2,"豆板醤":7,"甜麺醤":7,"コチュジャン":7,
+"オイスターソース":6,"ナンプラー":6,"脱脂粉乳":2,"粉ゼラチン":3,"粉寒天":1,"めんつゆ":6,"ポン酢":6,"焼肉のたれ":6,"味の素":4,
+"顆粒だしの素":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2};
+
+
 chrome.runtime.onMessage.addListener(function(msg) {
   if (msg.reload) {
     location.reload();
@@ -9,16 +18,15 @@ chrome.runtime.onMessage.addListener(function(msg) {
   $(".ingredient_quantity.amount").each(function(){
     saji = msg.saji_str;
     concentrated = msg.concent_str;
-    console.log(saji + ", " + concentrated);
     var value = $(this).html();
-    console.log(value)
     if(!value) {
         return true;
     }
+    changeIngredients();
     
     if(value.indexOf('大さじ') != -1 || value.indexOf('小さじ') != -1) {
       console.log(value);
-      $(this).html(sajiChanger(value));
+      // $(this).html(sajiChanger(value));
     }
     
     
@@ -26,21 +34,49 @@ chrome.runtime.onMessage.addListener(function(msg) {
 });
 
 $(document).ready(function(){
-    getIngredients();
+    // getIngredients();
 });
 
 
-function getIngredients(){
+function changeIngredients(){
   $(".ingredient_row").each(function(index, element) {
     var child = $(element).children();
-    console.log($(child).has(".name").text());
-    console.log($(child).has(".name").text().indexOf("ツナ")!=-1);
-    if($(child).has(".name").text().indexOf("ツナ")!=-1){
-      console.log($(element).find(".ingredient_quantity.amount"));
-      $(element).find(".ingredient_quantity.amount").html("ツナ");
-    }
+    for (let key in seasoning){
+      if($(child).has(".name").text().indexOf(key)!=-1){
+        if ($(element).find(".ingredient_quantity.amount").text().indexOf("大さじ")!=-1) {
+          var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(".ingredient_quantity.amount").text()));
+          var glams = tablespoon_num * 3.0 * seasoning[key];
+          $(element).find(".ingredient_quantity.amount").html(glams + "グラム");
+        }else if ($(element).find(".ingredient_quantity.amount").text().indexOf("小さじ")!=-1) {
+          var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(".ingredient_quantity.amount").text()));
+          var glams = teaspoon_num * seasoning[key];
+          $(element).find(".ingredient_quantity.amount").html(glams + "グラム");
+        }
+        
+      }
+    }  
   })
   
+}
+
+/**
+ * 小さじの値を返します
+ * @param {*} value 抜き出す素のテキスト
+ * @returns 値(文字列)
+ */
+function getTeaspoon_value(value) {
+  var pattern = /小さじ(.*)/u;
+  return value.match(pattern)[1];
+}
+
+/**
+ * 大さじの値を返します
+ * @param {*} value 抜き出す素のテキスト
+ * @returns 値(文字列)
+ */
+function getTablespoon_value(value) {
+  var pattern = /大さじ(.*)/u
+  return value.match(pattern)[1];
 }
 
 
@@ -54,7 +90,6 @@ function sajiChanger(value) {
       tilde_teaspoon.forEach(element => {
         result.push(round(value_generalizate(element) / 3));
       });
-      console.log(result);
       return "大さじ" + result[0] + "〜" + result[1];
     }else{
       var teaspoon_num = value_generalizate(teaspoon[1]);
@@ -71,7 +106,6 @@ function sajiChanger(value) {
       tilde_tablespoon.forEach(element => {
         result.push(round(value_generalizate(element) * 3));
       });
-      console.log(result);
       return "大さじ" + result[0] + "〜" + result[1];
       }else{
         var tablespoon_num = value_generalizate(tablespoon[1]);
@@ -82,6 +116,11 @@ function sajiChanger(value) {
   }
 }
 
+/**
+ * 少数第一位で四捨五入します
+ * @param {*} value 四捨五入する数値
+ * @returns 四捨五入後の数値
+ */
 function round(value) {
   var result = value * 10;
   result = Math.round(result);
@@ -89,6 +128,11 @@ function round(value) {
   return result;
 }
 
+/**
+ * 様々な表記を少数表示に変換します
+ * @param {*} param 一般化前の数値
+ * @returns 一般化後の数値(少数)
+ */
 function value_generalizate(param) {
   var result = 0.0;
   if (param.indexOf('と')!= -1) {
