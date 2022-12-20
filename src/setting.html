@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>設定画面</title>
+  <style>
+    body{
+      width: 250px;
+      height: 50px;
+    }
+  </style>
+</head>
+<body>
+<h1>大さじ小さじ</h1>
+<form>
+    <label><input type="radio" name="saji" value="b" id="big" checked>大さじ</label>
+    <label><input type="radio" name="saji" value="s" id="small">小さじ</label>
+    <label><input type="radio" name="saji" value="g" id="grams">グラム</label>
+</form>
+
+<input type="button" id="button1" value="決定" />
+<input type="button" id="reload" value="リセット" />
+<script src="jquery-3.6.2.min.js"></script>
+<script src="popup-script.js"></script>
+</body>
+</html>
