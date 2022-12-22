@@ -3,16 +3,17 @@
     "name": "Cooking Scale Changer",
     "version": "0.1",
     "description": "大さじ、小さじのような料理関連の単位を変換します",
-    "content_scripts": [
-        {
-            "matches": [ "https://cookpad.com/*" ],
-            "run_at": "document_end",
-            "all_frames": true,
-            "js": [ "jquery-3.6.2.min.js","content-script.js" ]
-        }
-    ],
+    "permissions": ["tabs"],
     "action":{
         "default_title":"設定画面を表示",
         "default_popup":"setting.html"
-      }
+      },
+    "content_scripts": [
+        {
+            "matches": [ "https://cookpad.com/*" ],
+            "run_at":"document_start",
+            "all_frames": true,
+            "js": [ "jquery-3.6.2.min.js","content-script.js","popup-script.js" ]
+        }
+    ]
 }

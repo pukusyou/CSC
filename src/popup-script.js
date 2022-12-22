@@ -1,15 +1,17 @@
-$(document).ready(function(){
-    //HTMLを読み込んだらここに書いたことを実行します。
-    // console.log("ok2")
-});
-
 $("#button1").on("click", () => {
-    const saji = $('input[name="saji"]:checked').val();
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        saji_str: saji 
+    chrome.tabs.query({ active: true, currentWindow: true }, (e) => {
+    var url = e[0].url;
+    if (url.indexOf("cookpad.com")==-1) {
+      return;
+    }else{
+      const saji = $('input[name="saji"]:checked').val();
+      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          saji_str: saji 
+        });
       });
-    });
+    }
+  });
   });
 
 $("#reload").on("click", () => {

@@ -3,23 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>設定画面</title>
-  <style>
-    body{
-      width: 250px;
-      height: 50px;
-    }
-  </style>
+  <link rel="stylesheet" href="setting.css">
 </head>
 <body>
-<h1>大さじ小さじ</h1>
-<form>
-    <label><input type="radio" name="saji" value="b" id="big" checked>大さじ</label>
-    <label><input type="radio" name="saji" value="s" id="small">小さじ</label>
-    <label><input type="radio" name="saji" value="g" id="grams">グラム</label>
-</form>
-
-<input type="button" id="button1" value="決定" />
-<input type="button" id="reload" value="リセット" />
+<h1>Cooking Scale Changer</h1>
+<fieldset>
+  <input id="big" class="radio-inline__input" type="radio" name="saji" value="b" checked="checked"/>
+  <label class="radio-inline__label" for="big">
+      大さじ
+  </label>
+  <input id="small" class="radio-inline__input" type="radio" name="saji" value="s"/>
+  <label class="radio-inline__label" for="small">
+      小さじ
+  </label>
+  <input id="grams" class="radio-inline__input" type="radio" name="saji" value="g"/>
+  <label class="radio-inline__label" for="grams">
+      グラム
+  </label>
+</fieldset>
+<table>
+<tr>
+<div class="button">
+<input type="button" class="btn btn--orange" id="button1" value="決定" />
+<input type="button" class="btn btn--orange" id="reload" value="リセット" />
+</div>
+</tr>
+</table>
 <script src="jquery-3.6.2.min.js"></script>
 <script src="popup-script.js"></script>
 </body>

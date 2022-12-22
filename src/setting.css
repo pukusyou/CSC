@@ -1,0 +1,65 @@
+body {
+    font-family: sans-serif;
+    width: 300px;
+    height: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    font-size: 2em;
+    margin: 1em 0;
+  }
+  
+  fieldset {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .radio-inline__input {
+    display: none;
+  }
+  
+  .radio-inline__label {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 1em;
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+  
+  .radio-inline__input:checked + .radio-inline__label {
+    color: orange;
+  }
+  
+  table {
+    width: 100%;
+    text-align: center;
+    margin: 1em 0;
+  }
+  
+  .button {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .btn {
+    border: none;
+    color: white;
+    padding: 1em 2em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .btn--orange {
+    background-color: orange;
+  }
+  
+  #reload {
+    background-color: lightgray;
+  }
+  
