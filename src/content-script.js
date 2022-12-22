@@ -1,4 +1,4 @@
-var concentrated, glams, saji;
+var saji;
 
 var seasoning ={"水": 5, "酒": 5, "酢":5,"醤油,しょうゆ":6,"みりん":6,"みそ":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜":7,
 "メープルシロップ":7,"マーマレード":7,"油,オリーブオイル":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉":3,
@@ -42,14 +42,14 @@ function changeIngredients(){
         if($(child).has(".name").text().indexOf(sina)!=-1){
           if ($(element).find(".ingredient_quantity.amount").text().indexOf("大さじ")!=-1) {
             var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(".ingredient_quantity.amount").text()));
-            var glams = tablespoon_num * 3.0 * seasoning[key];
-            glams = round(glams);
-            $(element).find(".ingredient_quantity.amount").html(glams + "g");
+            var grams = tablespoon_num * 3.0 * seasoning[key];
+            grams = round(grams);
+            $(element).find(".ingredient_quantity.amount").html(grams + "g");
           }else if ($(element).find(".ingredient_quantity.amount").text().indexOf("小さじ")!=-1) {
             var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(".ingredient_quantity.amount").text()));
-            var glams = teaspoon_num * seasoning[key];
-            glams = round(glams);
-            $(element).find(".ingredient_quantity.amount").html(glams + "g");
+            var grams = teaspoon_num * seasoning[key];
+            grams = round(grams);
+            $(element).find(".ingredient_quantity.amount").html(grams + "g");
           }
         }
       });
