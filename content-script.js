@@ -1,20 +1,17 @@
 var saji;
 
-var seasoning ={"水": 5, "酒": 5, "酢":5,"醤油,しょうゆ":6,"みりん":6,"みそ":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜":7,
-"メープルシロップ":7,"マーマレード":7,"油,オリーブオイル":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉":3,
+// 小さじ1あたり
+var seasoning ={"水": 5, "酒,ワイン": 5, "酢":5,"醤油,しょうゆ":6,"みりん":6,"みそ,味噌":6,"塩":6,"砂糖":3,"水飴":7,"蜂蜜,はちみつ":7,
+"メープルシロップ":7,"マーマレード":7,"油,オリーブオイル":4,"バター":4,"マーガリン":4,"ラード":4,"小麦粉":3,"米粉":3,"片栗粉,薄力粉":3,
 "ベーキングパウダー":4,"重曹":4,"パン粉":1,"オートミール":2,"粉チーズ":2,"ごま":3,"ねりごま":6,"マヨネーズ":4,"牛乳":5,
-"ヨーグルト":5,"生クリーム":5,"トマトピューレ":6,"トマトケチャップ":6,"ウスターソース":6,"中濃ソース":7, "ドレッシング":5,
-"わさび粉":2,"わさび":5,"カレー粉":2,"からし粉":2,"からし":5,"マスタード":5,"胡椒":2,"豆板醤":7,"甜麺醤":7,"コチュジャン":7,
-"オイスターソース":6,"ナンプラー":6,"脱脂粉乳":2,"粉ゼラチン":3,"粉寒天":1,"めんつゆ":6,"ポン酢":6,"焼肉のたれ":6,"味の素":4,
-"顆粒だし,顆粒和風だし":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2};
+"ヨーグルト":5,"生クリーム":5,"トマトピューレ,トマトペースト":5.5,"ケチャップ":6,"ウスターソース":6,"中濃ソース":7, "ドレッシング":5,
+"わさび粉":2,"わさび":5,"カレー粉":2,"からし粉":2,"からし":5,"マスタード":5,"胡椒,コショー,こしょう":2,"豆板醤":7,"甜麺醤":7,"コチュジャン":7,
+"オイスターソース":6,"ナンプラー":6,"脱脂粉乳":2,"粉ゼラチン":3,"粉寒天":1,"めんつゆ,麺つゆ":6,"ポン酢":6,"焼肉のたれ":6,"味の素":4,
+"顆粒だし,顆粒和風だし":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2,"コンソメ":4,"鶏がら":2.5,"ガーリックパウダー":2,"タイム":2};
 
 
 chrome.runtime.onMessage.addListener(function(msg) {
   var saji = msg.saji_str;
-  if (msg.reload) {
-    location.reload();
-    return;
-  }else{
     if(saji=="g"){
       changeIngredients();
     }else{
@@ -23,15 +20,13 @@ chrome.runtime.onMessage.addListener(function(msg) {
         if(!value) {
             return;
         }
-        if (saji=="b") {
-          table_changer(element);
-        }else if (saji=="s") {
-          tea_changer(element);
+        if (saji=="s") {
+          table2tea(element);
+        }else if (saji=="b") {
+          tea2table(element);
         }
       });
     } 
-  }
-
 });
 
 function changeIngredients(){
@@ -81,7 +76,7 @@ function getTablespoon_value(value) {
 }
 
 
-function tea_changer(element) {
+function tea2table(element) {
   var value = $(element).html();
   value = hankaku2Zenkaku(value);
   if (value.indexOf('小さじ')!=-1) {
@@ -102,7 +97,7 @@ function tea_changer(element) {
     }
   }
 }
-function table_changer(element) {
+function table2tea(element) {
   var value = $(element).html();
   value = hankaku2Zenkaku(value);
   if (value.indexOf('大さじ')!=-1) {
@@ -114,7 +109,7 @@ function table_changer(element) {
       tilde_tablespoon.forEach(element => {
         result.push(round(value_generalizate(element) * 3));
       });
-      return $(element).html("大さじ" + result[0] + "〜" + result[1]);
+      return $(element).html("小さじ" + result[0] + "〜" + result[1]);
       }else{
         var tablespoon_num = value_generalizate(tablespoon[1]);
         var result = tablespoon_num * 3;
@@ -130,9 +125,9 @@ function table_changer(element) {
  * @returns 四捨五入後の数値
  */
 function round(value) {
-  var result = value * 10;
+  var result = value * 10.0;
   result = Math.round(result);
-  result = result / 10;
+  result = result / 10.0;
   return result;
 }
 
