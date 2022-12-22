@@ -10,7 +10,7 @@
       },
     "content_scripts": [
         {
-            "matches": [ "https://cookpad.com/*" ],
+            "matches": [ "https://cookpad.com/*","https://delishkitchen.tv/*" ],
             "run_at":"document_start",
             "all_frames": true,
             "js": [ "jquery-3.6.2.min.js","content-script.js","popup-script.js" ]
