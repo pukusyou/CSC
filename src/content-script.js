@@ -34,11 +34,6 @@ chrome.runtime.onMessage.addListener(function(msg) {
 
 });
 
-$(document).ready(function(){
-    // getIngredients();
-});
-
-
 function changeIngredients(){
   $(".ingredient_row").each(function(index, element) {
     var child = $(element).children();
@@ -47,12 +42,13 @@ function changeIngredients(){
         if($(child).has(".name").text().indexOf(sina)!=-1){
           if ($(element).find(".ingredient_quantity.amount").text().indexOf("大さじ")!=-1) {
             var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(".ingredient_quantity.amount").text()));
-
             var glams = tablespoon_num * 3.0 * seasoning[key];
+            glams = round(glams);
             $(element).find(".ingredient_quantity.amount").html(glams + "g");
           }else if ($(element).find(".ingredient_quantity.amount").text().indexOf("小さじ")!=-1) {
             var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(".ingredient_quantity.amount").text()));
             var glams = teaspoon_num * seasoning[key];
+            glams = round(glams);
             $(element).find(".ingredient_quantity.amount").html(glams + "g");
           }
         }
