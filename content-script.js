@@ -7,7 +7,8 @@ var seasoning ={"水": 5, "酒,ワイン": 5, "酢":5,"醤油,しょうゆ":6,"�
 "ヨーグルト":5,"生クリーム":5,"トマトピューレ,トマトペースト":5.5,"ケチャップ":6,"ウスターソース":6,"中濃ソース":7, "ドレッシング":5,
 "わさび粉":2,"わさび":5,"カレー粉":2,"からし粉":2,"からし":5,"マスタード":5,"胡椒,コショー,こしょう":2,"豆板醤":7,"甜麺醤":7,"コチュジャン":7,
 "オイスターソース":6,"ナンプラー":6,"脱脂粉乳":2,"粉ゼラチン":3,"粉寒天":1,"めんつゆ,麺つゆ":6,"ポン酢":6,"焼肉のたれ":6,"味の素":4,
-"顆粒だし,顆粒和風だし":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2,"コンソメ":4,"鶏がら":2.5,"ガーリックパウダー":2,"タイム":2};
+"顆粒だし,顆粒和風だし":3,"抹茶":2,"紅茶":2,"ココア":2,"コーヒー":2,"昆布茶":2,"コンソメ":4,"鶏がら":2.5,"ガーリックパウダー":2,"タイム":2,
+"白だし,白出汁":5};
 
 /**
  * mainとなる処理
@@ -17,44 +18,42 @@ var seasoning ={"水": 5, "酒,ワイン": 5, "酢":5,"醤油,しょうゆ":6,"�
 chrome.runtime.onMessage.addListener(function(msg) {
   var saji = msg.saji_str;
   var web = msg.web_str;
+  var ingredient_list,ingredient_amount = "";
+    switch (web) {
+      case "cookpad":
+        ingredient_list=".ingredient_row";
+        ingredient_amount=".ingredient_quantity.amount"
+        break;
+      case "delishkitchen":
+        ingredient_list=".ingredient";
+        ingredient_amount=".ingredient-serving"
+        break;
+      case "kurashiru":
+        ingredient_list=".ingredient-list-item";
+        ingredient_amount=".ingredient-quantity-amount"
+        break;
+      case "rakuten":
+        ingredient_list=".recipe_material__item";
+        ingredient_amount=".recipe_material__item_serving"
+        break;
+      // case "nadia":
+      //   ingredient_list="li";
+      //   ingredient_amount=".IngredientsList_amount__31Tb6"
+      //   break;  
+      default:
+        break;
+    }
     if(saji=="g"){
-      switch (web) {
-        case "cookpad":
-          spoon2grams(".ingredient_row",".ingredient_quantity.amount");
-          break;
-        case "delishkitchen":
-          spoon2grams(".ingredient",".ingredient-serving");
-          break;
-        default:
-          break;
-      }
-    }else{
-        if (saji=="s") {
-          switch (web) {
-            case "cookpad":
-              table2tea(".ingredient_quantity.amount");
-              break;
-            case "delishkitchen":
-              table2tea(".ingredient-serving");
-              break;
-            default:
-              break;
-          }
-          table2tea();
-        }else if (saji=="b") {
-          switch (web) {
-            case "cookpad":
-              tea2table(".ingredient_quantity.amount");
-              break;
-            case "delishkitchen":
-              tea2table(".ingredient-serving");
-              break;
-            default:
-              break;
-          }
-          
-        }
-    } 
+      // if (web=="nadia") {
+      //   spoon2grams_nadia(ingredient_list,ingredient_amount);
+      // }else{
+        spoon2grams(ingredient_list,ingredient_amount);
+      // }
+    }else if (saji=="s") {
+      table2tea(ingredient_amount);
+    }else if (saji=="b") {
+      tea2table(ingredient_amount);
+    }
 });
 
 /**
@@ -64,6 +63,39 @@ chrome.runtime.onMessage.addListener(function(msg) {
  */
 function spoon2grams(ingredient_list, ingredient_amount){
   $(ingredient_list).each(function(index, element) {
+    var child = $(element).children();
+    for (let key in seasoning){
+      key.split(",").forEach(sina => {
+        if($(child[0]).text().indexOf(sina)!=-1){
+          if ($(element).find(ingredient_amount).text().indexOf("大さじ")!=-1) {
+            var tablespoon_num = value_generalizate(getTablespoon_value($(element).find(ingredient_amount).text()));
+            var grams = tablespoon_num * 3.0 * seasoning[key];
+            grams = round(grams);
+            $(element).find(ingredient_amount).html(grams + "g");
+          }else if ($(element).find(ingredient_amount).text().indexOf("小さじ")!=-1) {
+            var teaspoon_num = value_generalizate(getTeaspoon_value($(element).find(ingredient_amount).text()));
+            var grams = teaspoon_num * seasoning[key];
+            grams = round(grams);
+            $(element).find(ingredient_amount).html(grams + "g");
+          }
+        }
+      });
+    }  
+  })
+}
+
+/**
+ * さじ表記からグラムに書き換えます
+ * @param {*} ingredient_list 材料のリストを表すクラス
+ * @param {*} ingredient_amount 材料の量を表すクラス
+ */
+function spoon2grams_nadia(ingredient_list, ingredient_amount){
+  // console.log($(".IngredientsList_list__1jDm2").children().find(".IngredientsList_ingredient__3wBu0").text());
+  // $(".IngredientsList_list__1jDm2").children().each(function(index, element) {
+  //   console.log($(element).find(".IngredientsList_ingredient__3wBu0").text());
+  // });
+
+  $(".IngredientsList_list__1jDm2").children().each(function(index, element) {
     var child = $(element).children();
     for (let key in seasoning){
       key.split(",").forEach(sina => {
@@ -193,7 +225,12 @@ function value_generalizate(param) {
       }
     });
   }else{
-    result = parseFloat(param);
+    if (param.indexOf('/')!=-1) {
+      var split_value = param.split("/");
+      result = result + (parseFloat(split_value[0]) / parseFloat(split_value[1]));
+    }else{
+      result = result + parseFloat(param);
+    }
   }
   return result;
 }
@@ -204,7 +241,8 @@ function value_generalizate(param) {
  * @returns 半角の文字列
  */
 function zenkaku2Hankaku(str) {
-  return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+  // return str.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+    return str.replace(/[！-～]/g, function(s) {
       return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
   });
 }
